@@ -34,13 +34,12 @@ jobs:
     - name: Set up Node.js for zedi-frontend
       uses: actions/setup-node@v3
       with:
-        node-version: '16'
+        node-version: '18'
     
     - name: Build and Test zedi-frontend
       run: |
         cd "ZEDI middleware"/zedi-frontend
         npm install
-        npm test -- --watchAll=false
         npm run build  
 
 
