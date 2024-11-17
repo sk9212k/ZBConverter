@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZEDI middleware", "ZEDI middleware", "{35F2552B-6480-4B47-8896-E15524ECB0C6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZEDIBackend", "ZEDI middleware\ZEDIBackend\ZEDIBackend.csproj", "{B59694F9-6A2F-4669-B478-2EBF9F978E4D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B59694F9-6A2F-4669-B478-2EBF9F978E4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B59694F9-6A2F-4669-B478-2EBF9F978E4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B59694F9-6A2F-4669-B478-2EBF9F978E4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B59694F9-6A2F-4669-B478-2EBF9F978E4D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B59694F9-6A2F-4669-B478-2EBF9F978E4D} = {35F2552B-6480-4B47-8896-E15524ECB0C6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E60BCA94-1664-4423-8DB8-6D7A441E383F}
+	EndGlobalSection
+EndGlobal
