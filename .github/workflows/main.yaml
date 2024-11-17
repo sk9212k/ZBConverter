@@ -73,10 +73,15 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: Install Dependencies
+        run: |
+          pip install azure-functions
+          pip install azure-storage-blob
+          pip install lxml
+
       - name: Build and Test ZEDIFunctions
         run: |
           cd ZEDIFunctions
-          pip install -r requirements.txt
           python -m unittest discover
 
 
