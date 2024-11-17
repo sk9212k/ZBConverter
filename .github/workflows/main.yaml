@@ -38,7 +38,7 @@ jobs:
     
     - name: Build and Test zedi-frontend
       run: |
-        cd ZEDI middleware/zedi-frontend
+        cd "ZEDI middleware"/zedi-frontend
         npm install
         npm test -- --watchAll=false
         npm run build  
