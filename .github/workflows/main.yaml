@@ -2,24 +2,100 @@ name: CICD-PIPELINE
 
 on:
   push:
-     branches: [ "master" ]
+    branches: [ "master" ]
   pull_request:
-     branches: [ "master" ]
+    branches: [ "master" ]
 
 jobs:
-  SonarCloudSCan:
+  # SonarCloudSCan:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #           fetch-depth: 0
+  #     - name: SonarCloud Scan
+  #       uses: sonarsource/sonarcloud-github-action@master
+  #       env:
+  #           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+  #           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #       with:
+  #         args: >
+  #           -Dsonar.organization=sk9212k
+  #           -Dsonar.projectKey=ZBConverter
+  #           -Dsonar.python.coverage.reportPaths=coverage.xml
+
+  # 1. Node.js (React Frontend)
+  build-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-            fetch-depth: 0
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-            GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          node-version: '16' # Use the Node.js version specified in your project
+
+      - name: Install Dependencies
+        run: npm install
+        working-directory: ./zedi-frontend
+
+      - name: Run Tests
+        run: npm test -- --watchAll=false
+        working-directory: ./zedi-frontend
+
+      - name: Build Frontend
+        run: npm run build
+        working-directory: ./zedi-frontend
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
         with:
-          args: >
-              -Dsonar.organization=sk9212k
-              -Dsonar.projectKey=ZBConverter
-              -Dsonar.python.coverage.reportPaths=coverage.xml
+          name: frontend-build
+          path: ./zedi-frontend/build
+
+  # 2. .NET (Backend)
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0' # Use the .NET version specified in your project
+
+      - name: Restore Dependencies
+        run: dotnet restore ./ZEDI\ middleware/ZEDIBackend/ZEDIBackend.csproj
+
+      - name: Build Project
+        run: dotnet build --configuration Release ./ZEDI\ middleware/ZEDIBackend/ZEDIBackend.csproj
+
+      - name: Run Tests
+        run: dotnet test --no-build --verbosity normal ./ZEDI\ middleware/ZEDIBackend/ZEDIBackend.csproj
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build
+          path: ./ZEDI\ middleware/ZEDIBackend/bin/Debug/net8.0
+
+  # 3. Python (Azure Function)
+  test-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9' # Use the Python version specified in your requirements.txt
+
+      - name: Install Dependencies
+        run: pip install -r ./ZEDIFunctions/requirements.txt
+
+      - name: Run Tests
+        run: python -m unittest discover -s ./ZEDIFunctions
+
