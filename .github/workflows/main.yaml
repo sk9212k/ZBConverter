@@ -7,6 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
+  # SonarCloud Scan (commented, left unchanged as per your requirement)
   # SonarCloudSCan:
   #   runs-on: ubuntu-latest
   #   steps:
@@ -38,25 +39,18 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
-        working-directory: ./zedi-frontend
+        working-directory: ./ZEDI\ middleware/zedi-frontend
 
       - name: Run Tests
         run: npm test -- --watchAll=false
-        working-directory: ./zedi-frontend
+        working-directory: ./ZEDI\ middleware/zedi-frontend
 
       - name: Build Frontend
         run: npm run build
-        working-directory: ./zedi-frontend
-
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: frontend-build
-          path: ./zedi-frontend/build
+        working-directory: ./ZEDI\ middleware/zedi-frontend
 
   # 2. .NET (Backend)
   build-backend:
-    needs: build-frontend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -76,15 +70,8 @@ jobs:
       - name: Run Tests
         run: dotnet test --no-build --verbosity normal ./ZEDI\ middleware/ZEDIBackend/ZEDIBackend.csproj
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: backend-build
-          path: ./ZEDI\ middleware/ZEDIBackend/bin/Debug/net8.0
-
   # 3. Python (Azure Function)
   test-function:
-    needs: build-backend
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -100,4 +87,5 @@ jobs:
 
       - name: Run Tests
         run: python -m unittest discover -s ./ZEDIFunctions
+
 
