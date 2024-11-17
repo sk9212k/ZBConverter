@@ -29,18 +29,39 @@ jobs:
   build-frontend:
     runs-on: ubuntu-latest
     steps: 
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Node.js for zedi-frontend
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-    
-    - name: Build and Test zedi-frontend
-      run: |
-        cd "ZEDI middleware"/zedi-frontend
-        npm install
-        npm run build  
+      - name: Set up Node.js for zedi-frontend
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Build and Test zedi-frontend
+        run: |
+          cd "ZEDI middleware/zedi-frontend"
+          npm install
+          npm run build
+
+  # 2. .NET (Backend)
+  build-backend:
+    runs-on: ubuntu-latest
+    needs: build-frontend
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build and Test HelloService
+        run: |
+          cd "ZEDI middleware/ZEDIBackend"
+          dotnet restore
+          dotnet build --no-restore
+          dotnet test --no-build --verbosity normal
+
+      
 
 
 
