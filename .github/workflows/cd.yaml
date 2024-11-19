@@ -1,10 +1,15 @@
-name: Build and Deploy to Azure Web App using Azure CLI
+name: TechWorld CI/CD
 
 on:
   push:
     branches:
-      - frontend-prod
+      - main
   workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: 'zb-frontend' # Replace with your Web App name
+  AZURE_WEBAPP_PACKAGE_PATH: '.' # Path to your build directory
+  NODE_VERSION: '20.x'           # Replace with the required Node.js version
 
 jobs:
   build-and-deploy:
@@ -12,39 +17,37 @@ jobs:
 
     steps:
       # Step 1: Checkout the repository
-      - name: Checkout code
+      - name: Checkout the repo
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.x'
-
-      # Step 3: Install dependencies and build the application
-      - name: Install dependencies and build
-        run: |
-          npm install
-          npm run build
-
-      # Step 4: Zip the build directory
-      - name: Zip build artifacts
-        run: |
-          cd build
-          zip -r ../build.zip ./
-          cd ..
-
-      # Step 5: Login to Azure CLI
-      - name: Azure CLI Login
+      # Step 2: Login to Azure
+      - name: Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 6: Deploy to Azure Web App
-      - name: Deploy to Azure Web App
+      # Step 3: Set up Node.js environment
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Step 4: Install dependencies and build the project
+      - name: 'npm install, build, and test'
         run: |
-          az webapp deploy \
-            --resource-group ZBConverter \
-            --name zb-frontend \
-            --src-path build.zip \
-            --type zip
+          npm install
+          npm run build --if-present
+          npm run test --if-present
+        working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      # Step 5: Deploy the app to Azure Web App
+      - name: Deploy web app using Azure credentials
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      # Step 6: Logout from Azure
+      - name: Azure logout
+        run: az logout
+
