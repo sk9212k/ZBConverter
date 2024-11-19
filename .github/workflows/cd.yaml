@@ -3,7 +3,7 @@ name: TechWorld CI/CD
 on:
   push:
     branches:
-      - main
+      - frontend-prod
   workflow_dispatch:
 
 env:
