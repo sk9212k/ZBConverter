@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - zb-frontend
+name: Build and Deploy to Azure Web App using Azure CLI
 
 on:
   push:
@@ -11,31 +11,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - uses: actions/checkout@v4
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js version
-      - name: Set up Node.js version
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
 
-      # Step 3: Install dependencies and build the app
-      - name: Install dependencies and build app
+      # Step 3: Install dependencies and build the application
+      - name: Install dependencies and build
         run: |
           npm install
           npm run build
 
-      # Step 4: Zip artifact for deployment
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      # Step 4: Zip the build directory
+      - name: Zip build artifacts
+        run: |
+          cd build
+          zip -r ../build.zip ./
+          cd ..
 
-      # Step 5: Deploy to Azure Web App
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
+      # Step 5: Login to Azure CLI
+      - name: Azure CLI Login
+        uses: azure/login@v1
         with:
-          app-name: 'zb-frontend'
-          slot-name: 'Production'
-          package: ./release.zip
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_3D0DB0878F674D26AC099409F530DCBF }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      # Step 6: Deploy to Azure Web App
+      - name: Deploy to Azure Web App
+        run: |
+          az webapp deploy \
+            --resource-group ZBConverter \
+            --name zb-frontend \
+            --src-path build.zip \
+            --type zip
+
+       
